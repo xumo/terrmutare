@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<marcos>
+  <nodo>
+    <id>0</id>
+    <ip>192.168.15.121</ip>
+    <posicion>
+      <x>758.0</x>
+      <y>211.0</y>
+    </posicion>
+  </nodo>
+  <nodo>
+    <id>1</id>
+    <ip>192.168.15.122</ip>
+    <posicion>
+      <x>653.0</x>
+      <y>384.0</y>
+    </posicion>
+  </nodo>
+  <nodo>
+    <id>2</id>
+    <ip>192.168.15.123</ip>
+    <posicion>
+      <x>533.0</x>
+      <y>179.0</y>
+    </posicion>
+  </nodo>
+</marcos>
