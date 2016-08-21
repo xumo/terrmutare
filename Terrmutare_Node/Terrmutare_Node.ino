@@ -2,19 +2,19 @@
 #include <WiFiUDP.h>
 
 // wifi connection variables
-//const char* ssid = "TelevisaTeIdiotiza";
+///const char* ssid = "TelevisaTeIdiotiza";
 //const char* password = "5554402768";
 
-const char* ssid = "AXTEL-1722";
-const char* password = "C3121722";
+const char* ssid = "TERRMUTARE";
+const char* password = "terrm";
 
 
 boolean wifiConnected = false;
 boolean confirmado = false;
 
 //Direccion de l servidor
-char* remoto = "192.168.15.39";
-char* remoto2 = "192.168.1.90";
+char* remoto = "192.168.1.101";
+char* remoto2 = "192.168.1.76";
 
 
 boolean mandado = false;
@@ -33,10 +33,6 @@ char ReplyBuffer[] = "acknowledged"; // a string to send back
 
 char resultado[] = "0";
 
-
-/*
-  para leer el valor del sensor
-*/
 int salida;
 int entradaSensor;
 int btn;
@@ -45,102 +41,95 @@ char* ping;
 int redpin=1;
 
 int boton = 5;
-int puertoSensor = 0;
+int puertoSensor = A0;
 
 boolean prendido = false;
 boolean prendidoAnterior = false;
 boolean ordenRemota = false;
+boolean estadoSensor = false;
 
-/* PAra en sensor de distancia*/
-long distancia;
-long tiempo;
-int puertoTrigger = 15;
-int puertoEcho = 4;
+boolean cambioSensor = false;
+boolean cambioServidor = false;
+boolean estadoServidor = false;
+boolean estadoServidorAnterior = false;
+boolean estadoFinal = false;
+
 
 unsigned long tiempo, tiempoRef, tiempoMax;
 
 void setup() {
-  // Initialise Serial connection
+  // put your setup code here, to run once:
   Serial.begin(115200);
+    Serial.println("******* Inicio Terrmutare *********");
   
-  // pinMode(puertoTrigger, OUTPUT); /*activación del pin 9 como salida: para el pulso ultrasónico*/
-  // pinMode(puertoEcho, INPUT); /*activación del pin 8 como entrada: tiempo del rebote del ultrasonido*/
-  //Serial.println("******* Prueba de sensor *********");
-  //return;
   pinMode(redpin,OUTPUT);
   pinMode(puertoSensor, INPUT);
-  pinMode(boton, INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
-  // Initialise wifi connection
   wifiConnected = connectWifi();
-  
-  // only proceed if wifi connection successful
-  if(wifiConnected){
+
+   if(wifiConnected){
     udpConnected = connectUDP();
     if (udpConnected){
-      // initialise pins
-      pinMode(LED_BUILTIN,OUTPUT);
+
+      //pinMode(LED_BUILTIN,OUTPUT);
     }
   }
-  tiempoMax = 1500;
-  tiempoRef =  millis();
+
 }
 
 void loop() {
-  //leerSensor();
-  //return;
-  btn = digitalRead(boton);
-  entradaSensor =  analogRead(puertoSensor);
-
-  Serial.println("******* Sensor *********");
-  Serial.println(entradaSensor);
-  Serial.println("************************");
-
-  prendido =  btn == HIGH;
-
-  if( prendido  != prendidoAnterior ){
-    mandar( prendido ? 1 : 0);
-  }
-   
-  prendidoAnterior = prendido;
   
+  leerSensor();
   recibirUDP();
 
-  if( ordenRemota ){
-    salida = HIGH;
-  }else{
-    salida = !prendido ? HIGH : LOW;
+  if( cambioSensor){
+    cambioServidor = false; 
   }
-  
-  digitalWrite( LED_BUILTIN, salida ); 
 
+  if( cambioServidor){
+    prendido = estadoServidor;
+  }else{
+    prendido = estadoSensor;
+  }
+
+  salida = !prendido ? HIGH : LOW;
+  digitalWrite( LED_BUILTIN, salida ); 
 
   if( !confirmado){
     tiempo = millis() - tiempoRef;
     if( tiempo > tiempoMax){
       mandar(2);
+      tiempoRef = millis();
+      Serial.println("******* mandar 2 *********");
     }
   }
+
 }
 
+
 void leerSensor(){
-  
-  digitalWrite(puertoTrigger,LOW); /* Por cuestión de estabilización del sensor*/
-  delayMicroseconds(5);
-  digitalWrite(puertoTrigger, HIGH); /* envío del pulso ultrasónico*/
-  delayMicroseconds(10);
-  
-  tiempo=pulseIn(puertoEcho, HIGH); /* Función para medir la longitud del pulso entrante. Mide el tiempo que transcurrido entre el envío
-  del pulso ultrasónico y cuando el sensor recibe el rebote, es decir: desde que el pin 12 empieza a recibir el rebote, HIGH, hasta que
-  deja de hacerlo, LOW, la longitud del pulso entrante*/
-  distancia= int(0.017*tiempo); /*fórmula para calcular la distancia obteniendo un valor entero*/
-  /*Monitorización en centímetros por el monitor serial*/
-  Serial.println("Distancia ");
-  Serial.println(tiempo);
-  Serial.println(" cm");
-  delay(1000);
+
+   val=analogRead(puertoSensor);
+   val=(6762/(val-9))-4;
+   Serial.println(val);
+   if( val >=0 && val < 15 ){
+    prendido = true;
+   }else{
+    prendido = false;
+   }
+
+   if( prendido  != prendidoAnterior ){
+    mandar( prendido ? 1 : 0);
+    estadoSensor = prendido ? true : false;
+    cambioSensor = true;
+  }else{
+    cambioSensor = false;
+  }
+
+  prendidoAnterior = prendido;
 }
+
 
 void recibirUDP(){
   
@@ -177,25 +166,36 @@ void recibirUDP(){
       if(packetBuffer[0] == '1'){
         //value = HIGH; 
         Serial.println("Uno: "+packetBuffer[0]);
-        ordenRemota = true;
+        estadoServidor = true;
         confirmado = true;
+        //return true;
       }else if(packetBuffer[0] == '0'){
         //value = LOW;
         Serial.println("Cero: "+packetBuffer[0]);
-        ordenRemota = true;
+        estadoServidor = false;
         confirmado = true;
-      }else{
-        Serial.println("Sin cabula");
+        //return true;
+      }else if(packetBuffer[0] == '2'){
+        Serial.println("Confirmado");
+        confirmado = true;
       }
        Serial.println(packetBuffer[0]);
-      // turn LED on or off depending on value recieved
+
+       cambioServidor = true;
+       
+
+       estadoServidorAnterior = estadoServidor;
+
       
     }
     delay(10);
     
     }
   }
+
+  //return false;
 }
+
 
 void mandar(int valor){
   if(wifiConnected){
@@ -278,4 +278,3 @@ boolean connectWifi(){
   }
   return state;
 }
-
