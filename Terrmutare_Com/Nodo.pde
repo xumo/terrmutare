@@ -29,7 +29,7 @@ class NodoUI{
 		x 				= inX;
 		y 				= inY;
 		width 			= 50;
-		height 			= 50;
+		height 			= 70;
 		nodo 			= inNodo;
 		pressed 		= false;
 		seleccionado 	= false;
@@ -40,7 +40,7 @@ class NodoUI{
 	}
 
 	void mouseMove( float mX ,float mY ){
-		if( mX > x && mX < x + width && mY > y && mY < y + height  ){
+		if( mX > x && mX < x + width && mY > y && mY < y + height -20  ){
 			mOverMe = true;
 		}else{
 			mOverMe = false;
@@ -52,8 +52,20 @@ class NodoUI{
 			ofsetX = mX - x;
 			ofsetY = mY - y;
 			pressed = true;
+			//mandarOsc("1", nodo);
 		}else{
 			pressed = false;
+      //Pender
+      if( mX > x && mX < x + 25 && mY > y + 50 && mY < y + height   ){
+        apagar();
+      }
+      
+      //Apagar
+      if( mX > x + 25 && mX < x + 50 && mY > y + 50 && mY < y + height   ){
+        prender();
+      }
+
+
 		}
 	}
 
@@ -65,6 +77,20 @@ class NodoUI{
 
 	}
 
+  void prender(){
+    println("prender nodo: "+nodo.id);
+    sendNodo(nodo ,"1");
+    mandarOsc("1", nodo);
+    nodo.prendido=  true;
+  }
+  
+  void apagar(){
+    println("apagar nodo: "+nodo.id);
+    sendNodo(nodo ,"0");
+    mandarOsc("0", nodo);
+    nodo.prendido=  false  ;
+  }
+
 	void draw(){
 		if(seleccionado || mOverMe){
 			fill( mOverMe ? 200 : 120 );  
@@ -72,7 +98,16 @@ class NodoUI{
 		}
 		fill( 40 , 40, nodo.prendido ? 255 : 40  );  
 		//fill( 40 , mOverMe ? 255 : 40, mOverMe ? 255 : 40  );  
-		rect(x, y, width, height, 5);
+		rect(x, y, width, height -20, 5);
+
+    //Apagar
+    fill( 200 , 40,  40 );  
+    rect(x, y +50, 25, 20, 5);
+    
+    
+    //Prender
+    fill( 40 , 200,  40 );  
+    rect(x+25, y +50, 25, 20, 5);
 
 		textSize(12);
 		textAlign(CENTER);

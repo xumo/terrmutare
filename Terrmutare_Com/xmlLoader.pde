@@ -17,7 +17,7 @@ void cargarXml(){
   	nodo.conectado = false;
   	nodos.put(ip, nodo );
   	nodosID.put(id, nodo);
-  	//sendNodo(nodos.get(ip), "1");
+  	sendNodo(nodos.get(ip), "1");
   	nodosUi.add( new NodoUI( nodo, x , y ) );
   }
 

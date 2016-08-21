@@ -1,10 +1,10 @@
-import controlP5.*;
+//import controlP5.*;
 import hypermedia.net.*;
 
 import oscP5.*;
 import netP5.*;
 
-/*
+/*74063900
 *
 * Variables de comunicación UDP y OSC
 * ver soloUsp.pde y soloOsc
@@ -14,6 +14,9 @@ import netP5.*;
 UDP udp; 
 OscP5 oscP5;
 NetAddress myBroadcastLocation; 
+
+NetAddress direccionVisuales; 
+
 
 
 /*
@@ -101,9 +104,3 @@ void draw() {
    nodosUi.get(i).draw();
   }
 }
-
-
-
-
-
-

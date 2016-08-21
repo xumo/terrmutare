@@ -21,9 +21,15 @@ void receive( byte[] data, String ip, int port ) {
   		nodos.get(ip).conectado =  true;
   		sendNodo(nodos.get(ip), "1");
   	}
-  	nodos.get(ip).prendido = int(message) == 1;
-
+  	
+    nodos.get(ip).prendido = int(message) == 1;
+  	mandarOsc(message, nodos.get(ip));
   	println( "::: Prendes nodo :: " +  nodos.get(ip).conectado);
+  
+    if( int(message) == 2){
+      sendNodo(nodos.get(ip),"2");
+    }
+  
   }else{
   	Nodo nodo = new Nodo();
   	nodo.id = nodos.size();
@@ -31,8 +37,8 @@ void receive( byte[] data, String ip, int port ) {
   	nodo.conectado = true;
   	nodos.put(ip, nodo );
   	nodosID.put(nodo.id, nodo);
-  	sendNodo(nodos.get(ip), "1");
-  	println( ":::: Conectando con nodo ::::" );
+  	sendNodo(nodos.get(ip), "2");
+  	println( ":::: Conectando con nodo ::::"+ nodos.size() );
   	nodosUi.add( new NodoUI(nodo, random(width), random(height)) );
   }
 
