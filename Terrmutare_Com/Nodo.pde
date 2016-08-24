@@ -35,6 +35,31 @@ class NodoUI{
 		seleccionado 	= false;
 	}
 
+
+	float getPanX(){
+		float pan = 0.0;
+		if( x + width * 0.5 <= xEspacio){
+			pan =  -1.0;
+		}else if( x + width * 0.5 > xEspacio + anchoEspacio){
+			pan =  1.0;
+		}else{
+			pan = 2 * ( x + width * 0.5 - xEspacio - anchoEspacio * 0.5) / anchoEspacio;
+		}
+		return pan;
+	}
+
+	float getPanY(){
+		float pan = 0.0;
+		if( y + height * 0.5 <= yEspacio){
+			pan =  -1.0;
+		}else if( y + height * 0.5 > yEspacio + altoEspacio){
+			pan =  1.0;
+		}else{
+			pan = 2 * ( y + height * 0.5 - yEspacio - altoEspacio * 0.5) / altoEspacio;
+		}
+		return pan;
+	}
+
 	boolean overMe(){
 		return mOverMe;
 	}
@@ -48,11 +73,14 @@ class NodoUI{
 	}
 
 	void mouseDown( float mX ,float mY ){
+
+
 		if( mOverMe ){
 			ofsetX = mX - x;
 			ofsetY = mY - y;
 			pressed = true;
 			//mandarOsc("1", nodo);
+			println("pan : "+ getPanX() +" : " + getPanY());
 		}else{
 			pressed = false;
       //Pender
