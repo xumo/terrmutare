@@ -24,9 +24,26 @@ void mandarOsc(String message, Nodo nodo){
 		println("cero"); 
 	}
 
+
+  float panX = 0.0;
+  float panY = 0.0;
+
+  NodoUI noui = getNodoUI(nodo);
+
+  if (noui != null) {
+    println("yei: "+noui.nodo.id);
+    panX = noui.getPanX();
+    panY = noui.getPanY();
+    println("panX: "+ panX + " pany: "+ panY);
+
+  }
+
 	myOscMessage.add( nodo.id );
 	myOscMessage.add( int(message) );
-	oscP5.send(myOscMessage, myBroadcastLocation );
+  myOscMessage.add( panX );
+  myOscMessage.add( panY );
+	
+  oscP5.send(myOscMessage, myBroadcastLocation );
 	oscP5.send(myOscMessage, direccionVisuales );
 }
 
