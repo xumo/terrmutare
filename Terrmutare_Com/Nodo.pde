@@ -1,3 +1,13 @@
+NodoUI getNodoUI(Nodo nodo){
+	for (int i = 0; i < nodosUi.size(); i++) {
+	   if(nodosUi.get(i).nodo == nodo){
+	   		return nodosUi.get(i);
+	   };
+	  }
+	return null;
+}
+
+
 class Nodo{
 	
 	int id;
